@@ -1,3 +1,5 @@
 from django.contrib import admin
+from .models import Transaction  # Import your Transaction model
 
-# Register your models here.
+# This one line tells Django to show the Transaction model in the admin
+admin.site.register(Transaction)
