@@ -5,12 +5,29 @@
     <title>The Financial Tracker</title>
 </head>
 <body>
+    <h1>Add New Transaction</h1>
+
+    <form method="post">
+        {% csrf_token %} {{ form.as_p }}     <button type="submit">Add</button>
+    </form>
+
+    <hr>
+
+    <h2>Total Balance: ${{ total_balance|floatformat:2 }}</h2>
+
     <h1>Transaction List</h1>
 
     <ul>
         {% for transaction in transactions %}
             <li>
                 {{ transaction.description }}: ${{ transaction.amount }}
+
+                <a href="{% url 'transaction-edit' transaction.id %}">Edit</a>
+
+                <form method="post" action="{% url 'transaction-delete' transaction.id %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit">Delete</button>
+            </form>
             </li>
         {% empty %}
             <li>No transactions found.</li>

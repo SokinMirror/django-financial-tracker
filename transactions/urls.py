@@ -4,4 +4,11 @@ from . import views  # Import views from the current app
 urlpatterns = [
     # When a user visits the app's root, use the transaction_list view
     path('', views.transaction_list, name='transaction-list'),
+
+    # NEW DELETE URL
+    # <int:pk> captures the ID from the URL and passes it as an argument named 'pk'
+    path('delete/<int:pk>/', views.transaction_delete, name='transaction-delete'),
+
+    # NEW EDIT URL
+    path('edit/<int:pk>/', views.transaction_edit, name='transaction-edit'),
 ]
