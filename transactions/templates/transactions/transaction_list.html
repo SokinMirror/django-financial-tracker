@@ -1,14 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>The Financial Tracker</title>
-</head>
-<body>
-    <h1>Add New Transaction</h1>
+{% extends 'transactions/base.html' %}
 
+{% block content %}
+
+    <a href="{% url 'upload-csv' %}">Upload CSV File</a>
+    <hr>
+    
+    <h1>Add New Transaction</h1>
     <form method="post">
-        {% csrf_token %} {{ form.as_p }}     <button type="submit">Add</button>
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Add</button>
     </form>
 
     <hr>
@@ -21,18 +22,14 @@
         {% for transaction in transactions %}
             <li>
                 {{ transaction.description }}: ${{ transaction.amount }}
-
                 <a href="{% url 'transaction-edit' transaction.id %}">Edit</a>
-
                 <form method="post" action="{% url 'transaction-delete' transaction.id %}" style="display:inline;">
-                {% csrf_token %}
-                <button type="submit">Delete</button>
-            </form>
+                    {% csrf_token %}
+                    <button type="submit">Delete</button>
+                </form>
             </li>
         {% empty %}
             <li>No transactions found.</li>
         {% endfor %}
     </ul>
-
-</body>
-</html>
+{% endblock %}

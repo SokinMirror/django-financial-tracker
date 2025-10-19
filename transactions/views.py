@@ -1,7 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Transaction
-from .forms import TransactionForm  # 2. Import your new form
+from .models import Transaction, Category
+from .forms import TransactionForm, CSVUploadForm  # 2. Import your new form
 from django.db.models import Sum
+import csv # Import Python's built-in CSV module
+import io
 
 def transaction_list(request):
     # Check if the form is being submitted
@@ -62,3 +64,56 @@ def transaction_edit(request, pk):
 
     # Render the edit page template
     return render(request, 'transactions/transaction_edit.html', {'form': form})
+
+def upload_csv(request):
+    if request.method == 'POST':
+        form = CSVUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            csv_file = request.FILES['csv_file']
+
+            # Read the file in memory
+            data_set = csv_file.read().decode('UTF-8')
+            io_string = io.StringIO(data_set)
+            next(io_string) # Skip the header row
+
+            from .models import Transaction, Category, Loan
+
+            for row in csv.reader(io_string, delimiter=',', quotechar='"'):
+                # Assumes CSV columns are: description, amount
+                # You MUST change this to match your bank's CSV
+                description = row[0]
+                amount = row[1]
+
+                # --- START DATA ANALYSIS ---
+                category = None
+                if 'COFFEE' in description.upper() or 'STARBUCKS' in description.upper():
+                    category = Category.objects.get(name='Coffee')
+                elif 'GROCERY' in description.upper():
+                    category = Category.objects.get(name='Food')
+                # --- END DATA ANALYSIS ---
+
+                # --- LOAN CHECKING LOGIC ---
+                # Try to find a loan that matches the description
+                # This is a simple check; it can get more complex
+                try:
+                    loan = Loan.objects.get(name__icontains=description)
+
+                    if amount == loan.monthly_payment:
+                        print(f"Successfully paid installment for {loan.name}")
+                        # You could also link this transaction to the loan
+                    else:
+                        print(f"WARNING: Paid {amount} for {loan.name}, but expected {loan.monthly_payment}")
+                except Loan.DoesNotExist:
+                    pass # Not a loan payment
+                # --- END LOAN CHECKING ---
+
+                Transaction.objects.create(
+                    description=description,
+                    amount=float(amount),
+                    category=category
+                )
+            return redirect('transaction-list')
+    else:
+        form = CSVUploadForm()
+
+    return render(request, 'transactions/upload_csv.html', {'form': form})

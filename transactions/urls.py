@@ -11,4 +11,6 @@ urlpatterns = [
 
     # NEW EDIT URL
     path('edit/<int:pk>/', views.transaction_edit, name='transaction-edit'),
+
+    path('upload/', views.upload_csv, name='upload-csv'),
 ]
