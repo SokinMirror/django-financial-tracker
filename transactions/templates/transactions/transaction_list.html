@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>The Financial Tracker</title>
+</head>
+<body>
+    <h1>Transaction List</h1>
+
+    <ul>
+        {% for transaction in transactions %}
+            <li>
+                {{ transaction.description }}: ${{ transaction.amount }}
+            </li>
+        {% empty %}
+            <li>No transactions found.</li>
+        {% endfor %}
+    </ul>
+
+</body>
+</html>
