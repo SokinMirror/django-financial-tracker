@@ -161,3 +161,24 @@ def upload_csv(request):
         form = CSVUploadForm()
         
     return render(request, 'transactions/upload_csv.html', {'form': form})
+
+
+def transaction_summary(request):
+    # This is the core query!
+    summary = Transaction.objects \
+        .values('description') \
+        .annotate(total_amount=Sum('amount')) \
+        .order_by('total_amount') # Order from biggest expense to biggest income
+
+    # This gives you data like:
+    # [
+    #   {'category__name': 'Groceries', 'total_amount': -450.50},
+    #   {'category__name': 'Coffee', 'total_amount': -80.20},
+    #   {'category__name': None, 'total_amount': -50.00},
+    #   {'category__name': 'Salary', 'total_amount': 3000.00}
+    # ]
+
+    context = {
+        'summary': summary
+    }
+    return render(request, 'transactions/transaction_summary.html', context)

@@ -1,0 +1,31 @@
+{% extends 'transactions/base.html' %}
+
+{% block content %}
+    <h1>Spending Summary by Description</h1>
+
+    <table border="1" style="width:100%">
+        <thead>
+            <tr>
+                <th>Description</th> <th>Total Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in summary %}
+                <tr>
+                    <td>
+                        {{ item.description }} 
+                    </td>
+                    <td>
+                        €{{ item.total_amount|floatformat:2 }}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="2">No transactions to summarize.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <br>
+    <a href="{% url 'transaction-list' %}">Back to full list</a>
+{% endblock %}

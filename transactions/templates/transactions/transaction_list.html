@@ -3,6 +3,7 @@
 {% block content %}
 
     <a href="{% url 'upload-csv' %}">Upload CSV File</a>
+    <a href="{% url 'transaction-summary' %}">View Summary</a>
     <hr>
     
     <h1>Add New Transaction</h1>
@@ -14,7 +15,7 @@
 
     <hr>
 
-    <h2>Total Balance: ${{ total_balance|floatformat:2 }}</h2>
+    <h2>Total Balance: €{{ total_balance|floatformat:2 }}</h2>
 
     <h1>Transaction List</h1>
 
