@@ -75,8 +75,12 @@ WSGI_APPLICATION = 'django_tracker.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'financial_tracker',     # The DB name you created in pgAdmin
+        'USER': 'postgres',                 # The default superuser
+        'PASSWORD': 'Anaz.1997', # The password you set in Step 1
+        'HOST': 'localhost',                # Or '127.0.0.1'
+        'PORT': '5432',                   # Default PostgreSQL port
     }
 }
 
