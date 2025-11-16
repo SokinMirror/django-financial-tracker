@@ -1,0 +1,14 @@
+{% extends 'transactions/base.html' %}
+
+{% block content %}
+    <h1>Loan List</h1>
+    <ul>
+        {% for loan in loans %}
+            <li>
+                <strong>{{ loan.name }}</strong>: Total Amount: €{{ loan.total_amount }}, Monthly Payment: €{{ loan.monthly_payment }}
+            </li>
+        {% empty %}
+            <li>No loans found.</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

@@ -17,4 +17,10 @@ urlpatterns = [
 
     # SUM URL
     path('summary/', views.transaction_summary, name='transaction-summary'),
+
+    # LOAN URLS
+    path('loans/', views.loan_list, name='loan-list'),
+    path('loans/create/', views.loan_create, name='loan-create'),
+    path('loans/edit/<int:pk>/', views.loan_edit, name='loan-edit'),
+    path('loans/delete/<int:pk>/', views.loan_delete, name='loan-delete'),
 ]

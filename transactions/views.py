@@ -3,7 +3,7 @@ import io
 import chardet
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Transaction, Category, Loan
-from .forms import TransactionForm, CSVUploadForm
+from .forms import LoanForm, TransactionForm, CSVUploadForm
 from django.db.models import Sum
 
 def transaction_list(request):
@@ -182,3 +182,37 @@ def transaction_summary(request):
         'summary': summary
     }
     return render(request, 'transactions/transaction_summary.html', context)
+
+# LOAN VIEWS
+
+def loan_list(request):
+    loans = Loan.objects.all()
+    return render(request, 'transactions/loan_list.html', {'loans': loans})
+
+def loan_create(request):
+    if request.method == 'POST':
+        form = LoanForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('loan-list')
+    else:
+        form = LoanForm()
+    return render(request, 'transactions/loan_form.html', {'form': form})
+
+def loan_edit(request, pk):
+    loan = get_object_or_404(Loan, pk=pk)
+    if request.method == 'POST':
+        form = LoanForm(request.POST, instance=loan)
+        if form.is_valid():
+            form.save()
+            return redirect('loan-list')
+    else:
+        form = LoanForm(instance=loan)
+    return render(request, 'transactions/loan_form.html', {'form': form})
+
+def loan_delete(request, pk):
+    loan = get_object_or_404(Loan, pk=pk)
+    if request.method == 'POST':
+        loan.delete()
+        return redirect('loan-list')
+    return render(request, 'transactions/loan_confirm_delete.html', {'loan': loan})

@@ -22,8 +22,12 @@
     <ul>
         {% for transaction in transactions %}
             <li>
-                {{ transaction.description }}: ${{ transaction.amount }}
+                <!-- 1 Category - Description - Amount -->
+                <strong>{{ transaction.category.name|default:"Uncategorized" }}</strong>:
+                {{ transaction.description }}: €{{ transaction.amount }}
+                <!-- 2 Edit Button -->
                 <a href="{% url 'transaction-edit' transaction.id %}">Edit</a>
+                <!-- 3 Delete Button -->
                 <form method="post" action="{% url 'transaction-delete' transaction.id %}" style="display:inline;">
                     {% csrf_token %}
                     <button type="submit">Delete</button>
