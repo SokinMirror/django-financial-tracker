@@ -8,8 +8,8 @@
 </head>
 <body>
     <div class="container">
-        <a href="{% url 'loan-list' %}">My Loans</a>
-        <a href="{% url 'transaction-list' %}">My Transactions</a>
+        <a href="{% url 'transaction-list' %}">Transactions</a>
+        <a href="{% url 'loan-list' %}">Loans</a>        
         <hr>
         {% block content %}
         {% endblock %}

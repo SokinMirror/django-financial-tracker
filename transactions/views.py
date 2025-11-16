@@ -2,7 +2,7 @@ import csv
 import io
 import chardet
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Transaction, Category, Loan
+from .models import Transaction, Category, Loan, Account, Payment
 from .forms import LoanForm, TransactionForm, CSVUploadForm
 from django.db.models import Sum
 
@@ -95,9 +95,32 @@ def upload_csv(request):
             
             io_string = io.StringIO(data_set)
             
+            # --- START NEW ACCOUNT LINKING ---
             try:
-                # Skip the 6 header rows
-                for _ in range(6):
+                # 1. Read the first line (the header)
+                first_line = next(io_string)
+                print(f"CSV Header Line 1: {first_line}")
+                
+                # 2. Extract the account number (e.g., GR720...)
+                # It's in the 2nd "cell" (index 1), after ': '
+                header_cell = first_line.split(';')[1] 
+                account_num = header_cell.split(': ')[1].strip()
+            except (IndexError, ValueError, AttributeError):
+                account_num = None
+                print("Could not parse account number from CSV header")
+            
+            # 3. Find this account in your database
+            account_object = None
+            if account_num:
+                try:
+                    account_object = Account.objects.get(account_number=account_num)
+                    print(f"--- Processing for Account: {account_object.name} ---")
+                except Account.DoesNotExist:
+                    print(f"--- WARNING: No account found for {account_num} ---")
+
+            try:
+                # Skip the 5 header rows
+                for _ in range(5):
                     next(io_string)
             except StopIteration:
                 context = {'form': form, 'error': 'The file is empty or has too few rows.'}
@@ -149,12 +172,14 @@ def upload_csv(request):
                 # (Add more categorization rules here)
                 # --- END DATA ANALYSIS ---
 
-                Transaction.objects.create(
+                new_transaction = Transaction.objects.create(
                     description=description,
                     amount=amount, # This will be positive for income, negative for charges
-                    category=category
+                    category=category,
+                    raw_row_data=raw_row_string,
+                    account=account_object
                 )
-            
+            match_loan_payments(new_transaction)
             print("--- FINISHED CSV IMPORT ---")
             return redirect('transaction-list')
     else:
@@ -162,6 +187,32 @@ def upload_csv(request):
         
     return render(request, 'transactions/upload_csv.html', {'form': form})
 
+def match_loan_payments(transaction):
+    # Only check expenses
+    if transaction.amount >= 0:
+        return
+
+    all_loans = Loan.objects.all()
+    for loan in all_loans:
+        # LOGIC 1: Amount must match
+        if abs(transaction.amount) == loan.monthly_payment:
+            # LOGIC 2: Description must be similar (you can make this smarter)
+            if loan.name.lower() in transaction.description.lower():
+                # It's a match!
+                print(f"Found a match for {loan.name}!")
+                # Check if a payment for this month/year already exists
+                t_date = transaction.date # Get transaction date
+                exists = Payment.objects.filter(loan=loan, payment_month=t_date.month, payment_year=t_date.year).exists()
+
+                if not exists:
+                    Payment.objects.create(
+                        loan=loan,
+                        transaction=transaction,
+                        payment_month=t_date.month,
+                        payment_year=t_date.year
+                    )
+                    # This installment is now flagged as paid!
+                    break # Stop checking other loans
 
 def transaction_summary(request):
     # This is the core query!
