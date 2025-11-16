@@ -20,6 +20,7 @@ urlpatterns = [
 
     # LOAN URLS
     path('loans/', views.loan_list, name='loan-list'),
+    path('loans/<int:pk>/', views.loan_detail, name='loan-detail'),
     path('loans/create/', views.loan_create, name='loan-create'),
     path('loans/edit/<int:pk>/', views.loan_edit, name='loan-edit'),
     path('loans/delete/<int:pk>/', views.loan_delete, name='loan-delete'),

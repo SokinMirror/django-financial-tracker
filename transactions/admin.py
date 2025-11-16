@@ -1,6 +1,6 @@
 from django.contrib import admin
 # 1. ADD 'Account' TO THIS IMPORT LIST
-from .models import Transaction, Category, Loan, Account 
+from .models import Transaction, Category, Loan, Account, Installment
 
 # This class customizes how the Transaction admin page looks
 class TransactionAdmin(admin.ModelAdmin):

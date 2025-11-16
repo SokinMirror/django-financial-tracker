@@ -1,0 +1,45 @@
+{% extends 'transactions/base.html' %}
+
+{% block content %}
+    <h1>{{ loan.name }}</h1>
+    <h3>Total Remaining: €{{ remaining_total|floatformat:2 }}</h3>
+
+    <form method="POST">
+        {% csrf_token %}
+        <table border="1" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                    <th>Manually Paid</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for installment in installments %}
+                <tr>
+                    <td>{{ installment.due_date|date:"F Y" }}</td>
+                    <td>
+                        {% if installment.linked_transaction %}
+                            Auto-Paid ({{ installment.linked_transaction.description }})
+                        {% else %}
+                            {{ installment.status }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if installment.status == 'PENDING' %}
+                            <input type="checkbox" name="mark_paid" value="{{ installment.id }}">
+                        {% else %}
+                            Paid
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <br>
+        <button type="submit">Update Payments</button>
+    </form>
+
+    <br>
+    <a href="{% url 'loan-list' %}">Back to All Loans</a>
+{% endblock %}

@@ -5,7 +5,7 @@
     <ul>
         {% for loan in loans %}
             <li>
-                <strong>{{ loan.name }}</strong>: Total Amount: €{{ loan.total_amount }}, Monthly Payment: €{{ loan.monthly_payment }}
+                <a href="{% url 'loan-detail' loan.id %}">{{ loan.name }}</a> - €{{ loan.total_amount }}
             </li>
         {% empty %}
             <li>No loans found.</li>

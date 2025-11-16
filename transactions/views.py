@@ -2,9 +2,9 @@ import csv
 import io
 import chardet
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Transaction, Category, Loan, Account, Payment
+from .models import Transaction, Category, Loan, Account, Installment
 from .forms import LoanForm, TransactionForm, CSVUploadForm
-from django.db.models import Sum
+from django.db.models import Sum, Q
 
 def transaction_list(request):
     # Check if the form is being submitted
@@ -186,6 +186,40 @@ def upload_csv(request):
         form = CSVUploadForm()
         
     return render(request, 'transactions/upload_csv.html', {'form': form})
+
+def loan_detail(request, pk):
+    loan = get_object_or_404(Loan, pk=pk)
+
+    if request.method == 'POST':
+        # 1. Get a list of all installment IDs that were checked
+        paid_ids = request.POST.getlist('mark_paid')
+
+        # 2. Loop over the IDs and update the status
+        for installment_id in paid_ids:
+            installment = get_object_or_404(Installment, id=installment_id)
+            # Only update if it's currently PENDING
+            if installment.loan == loan and installment.status == 'PENDING':
+                installment.status = 'PAID'
+                installment.save()
+
+        # 3. Redirect back to the same page to show the update
+        return redirect('loan-detail', pk=loan.pk)
+
+    # Get all installments for this loan
+    installments = loan.installments.all().order_by('due_date')
+
+    # Calculate remaining total
+    remaining = Installment.objects.filter(loan=loan, status='PENDING') \
+                                 .aggregate(total=Sum('loan__monthly_payment'))
+
+    remaining_total = remaining['total'] or 0.00
+
+    context = {
+        'loan': loan,
+        'installments': installments,
+        'remaining_total': remaining_total
+    }
+    return render(request, 'transactions/loan_detail.html', context)
 
 def match_loan_payments(transaction):
     # Only check expenses
