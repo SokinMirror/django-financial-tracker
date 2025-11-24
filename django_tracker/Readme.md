@@ -3,9 +3,10 @@
 ## How to Start (Daily Checklist)
 
 1.  **Pull** latest code from GitHub (use Sourcetree).
+
 2.  **Activate** the virtual environment:
     ```powershell
-    .\venv\Scripts\Activate.ps1
+    ./venv/scripts/activate.ps1
     ```
 3.  **Run** the server:
     ```powershell
