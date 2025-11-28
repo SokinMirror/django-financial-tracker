@@ -84,7 +84,7 @@ DATABASES = {
         'USER': 'postgres',                   # The default superuser
         'PASSWORD': os.getenv('DB_PASSWORD'), # Reads from .env
         'HOST': 'localhost',                  # Or '127.0.0.1'
-        'PORT': os.getenv('DB_PORT', '5432'), # Default PostgreSQL port
+        'PORT': os.getenv('DB_PORT'), # Default PostgreSQL port
     }
 }
 
