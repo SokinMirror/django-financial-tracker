@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+
+load_dotenv() # This loads the variables from the .env file
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -76,11 +80,11 @@ WSGI_APPLICATION = 'django_tracker.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'financial_tracker',     # The DB name you created in pgAdmin
-        'USER': 'postgres',                 # The default superuser
-        'PASSWORD': 'Anaz.1997', # The password you set in Step 1
-        'HOST': 'localhost',                # Or '127.0.0.1'
-        'PORT': '5432',                   # Default PostgreSQL port
+        'NAME': 'financial_tracker',          # The DB name you created in pgAdmin
+        'USER': 'postgres',                   # The default superuser
+        'PASSWORD': os.getenv('DB_PASSWORD'), # Reads from .env
+        'HOST': 'localhost',                  # Or '127.0.0.1'
+        'PORT': os.getenv('DB_PORT', '5432'), # Default PostgreSQL port
     }
 }
 
